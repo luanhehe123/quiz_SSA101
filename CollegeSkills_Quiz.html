@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>College Skills — Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf9f6;--surface:#ffffff;--surface2:#f3f1ec;--surface3:#ebe8e0;
+  --accent:#e07b3a;--accent2:#f59d5e;--accent-dim:rgba(224,123,58,0.1);
+  --green:#2ecc71;--green-dim:rgba(46,204,113,0.12);
+  --red:#e74c3c;--red-dim:rgba(231,76,60,0.1);
+  --blue:#3a7ae0;--blue-dim:rgba(58,122,224,0.1);
+  --purple:#7c5cbf;--purple-dim:rgba(124,92,191,0.1);
+  --text:#1a1714;--text2:#6b6458;--text3:#b0a898;
+  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
+  --sans:'Nunito',sans-serif;--mono:'Space Grotesk',sans-serif;
+  --r:10px;--r2:18px;--shadow:0 2px 12px rgba(0,0,0,0.07);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 100% 60% at 80% 0%,rgba(224,123,58,0.07),transparent),
+             radial-gradient(ellipse 60% 40% at 10% 90%,rgba(58,122,224,0.05),transparent);
+  pointer-events:none;z-index:0;}
+
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:0 16px 80px;}
+
+/* HEADER */
+header{padding:48px 0 32px;text-align:center;}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;}
+.logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;}
+.logo-text{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;}
+h1{font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:-1px;line-height:1.2;color:var(--text);}
+h1 span{color:var(--accent);}
+.hdr-sub{font-size:14px;color:var(--text2);margin-top:8px;font-weight:400;}
+
+/* CHAPTER GRID */
+.section-label{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;padding-left:2px;}
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:28px;}
+.ch-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:16px 14px 14px;cursor:pointer;transition:all 0.18s;position:relative;box-shadow:var(--shadow);}
+.ch-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(224,123,58,0.15);}
+.ch-card.completed{border-color:rgba(46,204,113,0.4);background:rgba(46,204,113,0.04);}
+.ch-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);letter-spacing:2px;margin-bottom:5px;}
+.ch-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;}
+.ch-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.ch-score{font-size:11px;font-family:var(--mono);margin-top:8px;color:var(--text2);}
+.ch-tick{position:absolute;top:10px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;}
+.ch-card.completed .ch-tick{display:flex;}
+
+/* COLOR THEMES per topic */
+.theme-a .ch-num{color:#e07b3a;} .theme-a:hover{border-color:#e07b3a;}
+.theme-b .ch-num{color:#3a7ae0;} .theme-b:hover{border-color:#3a7ae0;}
+.theme-c .ch-num{color:#7c5cbf;} .theme-c:hover{border-color:#7c5cbf;}
+.theme-d .ch-num{color:#27ae60;} .theme-d:hover{border-color:#27ae60;}
+.theme-e .ch-num{color:#e74c3c;} .theme-e:hover{border-color:#e74c3c;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--r);border:1.5px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all 0.16s;box-shadow:var(--shadow);}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(224,123,58,0.3);}
+.btn-primary:hover{background:#c96a2a;border-color:#c96a2a;color:#fff;}
+.btn-sm{padding:8px 16px;font-size:13px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+/* QUIZ */
+#quiz-screen{display:none;}
+.q-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.q-title-area{}
+.q-title{font-size:14px;font-weight:700;color:var(--text);}
+.q-subtitle{font-size:12px;color:var(--text2);font-family:var(--mono);margin-top:2px;}
+.score-pills{display:flex;gap:8px;}
+.pill{font-size:12px;font-weight:700;font-family:var(--mono);padding:5px 12px;border-radius:20px;}
+.pill-g{background:var(--green-dim);color:var(--green);}
+.pill-r{background:var(--red-dim);color:var(--red);}
+
+.prog-wrap{margin-bottom:20px;}
+.prog-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 0.4s cubic-bezier(.4,0,.2,1);}
+
+.q-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:14px;box-shadow:var(--shadow);animation:popIn 0.22s ease;}
+@keyframes popIn{from{opacity:0;transform:translateY(6px) scale(0.99);}to{opacity:1;transform:none;}}
+.q-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.q-badge{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:0.5px;}
+.q-n-badge{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(224,123,58,0.2);}
+.q-tag-badge{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(58,122,224,0.2);}
+.q-ch-badge{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(124,92,191,0.2);}
+.q-multi-badge{background:rgba(255,193,7,0.12);color:#c67c00;border:1px solid rgba(255,193,7,0.3);}
+.q-text{font-size:16px;font-weight:600;line-height:1.65;color:var(--text);margin-bottom:20px;}
+
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:flex-start;gap:14px;padding:13px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all 0.15s;text-align:left;width:100%;color:var(--text);font-family:var(--sans);font-size:14px;font-weight:500;line-height:1.5;}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim);}
+.opt:disabled{cursor:default;}
+.opt-key{font-family:var(--mono);font-size:11px;font-weight:700;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1.5px solid var(--border2);border-radius:6px;color:var(--text3);flex-shrink:0;margin-top:1px;transition:all 0.15s;}
+.opt:hover:not(:disabled) .opt-key{background:var(--accent);border-color:var(--accent);color:#fff;}
+.opt.sel{border-color:var(--accent);background:var(--accent-dim);}
+.opt.sel .opt-key{background:var(--accent);border-color:var(--accent);color:#fff;}
+.opt.correct{border-color:#27ae60;background:var(--green-dim);}
+.opt.correct .opt-key{background:#27ae60;border-color:#27ae60;color:#fff;}
+.opt.wrong{border-color:var(--red);background:var(--red-dim);}
+.opt.wrong .opt-key{background:var(--red);border-color:var(--red);color:#fff;}
+.opt.reveal{border-color:#27ae60;background:var(--green-dim);}
+.opt.reveal .opt-key{background:#27ae60;border-color:#27ae60;color:#fff;}
+
+.feedback{display:none;margin-top:12px;padding:12px 16px;border-radius:var(--r);font-size:13px;font-weight:600;border:1.5px solid;}
+.feedback.ok{background:var(--green-dim);border-color:rgba(46,204,113,0.35);color:#27ae60;}
+.feedback.no{background:var(--red-dim);border-color:rgba(231,76,60,0.3);color:var(--red);}
+
+.nav-bar{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:var(--shadow);}
+
+/* NUMPAD */
+.numpad-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow);}
+.numpad-lbl{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;}
+.numpad{display:flex;flex-wrap:wrap;gap:5px;}
+.np{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--mono);font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.13s;}
+.np:hover{border-color:var(--accent);color:var(--accent);}
+.np.ok{background:var(--green-dim);border-color:rgba(46,204,113,0.4);color:#27ae60;}
+.np.bad{background:var(--red-dim);border-color:rgba(231,76,60,0.35);color:var(--red);}
+.np.cur{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* RESULT */
+#result-screen{display:none;}
+.res-hero{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:40px 28px;text-align:center;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.res-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.res-pct{font-family:var(--mono);font-size:64px;font-weight:700;line-height:1;margin-bottom:6px;}
+.res-grade{font-size:18px;font-weight:800;margin-bottom:6px;}
+.res-sub{font-size:13px;color:var(--text2);}
+.res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:480px){.res-grid{grid-template-columns:1fr 1fr;}}
+.rbox{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--shadow);}
+.rn{font-family:var(--mono);font-size:22px;font-weight:700;}
+.rl{font-size:11px;color:var(--text3);margin-top:3px;}
+
+.wrong-sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:16px;box-shadow:var(--shadow);}
+.wrong-sec h3{font-size:12px;font-family:var(--mono);font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:18px;}
+.wi{border-top:1.5px solid var(--border);padding:14px 0;}
+.wi:first-child{border-top:none;}
+.wi-q{font-size:13px;font-weight:600;color:var(--text);line-height:1.55;margin-bottom:8px;}
+.wi-row{display:flex;gap:6px;flex-wrap:wrap;}
+.wi-your{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--red-dim);color:var(--red);font-weight:600;}
+.wi-ans{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:#27ae60;font-weight:600;}
+
+@media(max-width:600px){
+  .q-card,.numpad-wrap,.nav-bar,.res-hero,.wrong-sec{padding:16px 14px;}
+  .ch-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo-row">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text">COLLEGE SKILLS</div>
+  </div>
+  <h1>Student Success<br><span>Skills Quiz</span></h1>
+  <p class="hdr-sub">5 chủ đề · 20 tiết · Câu hỏi từ slide bài giảng</p>
+</header>
+
+<!-- HOME -->
+<div id="home-screen">
+  <div class="section-label">Chọn chủ đề để luyện tập</div>
+  <div class="ch-grid" id="ch-grid"></div>
+  <div class="btn-row" style="justify-content:center;margin-top:6px;">
+    <button class="btn btn-primary" onclick="startAll()">Làm tất cả →</button>
+    <button class="btn" onclick="startRandom()">🎲 Ngẫu nhiên</button>
+    <button class="btn" id="btn-retry-wrong" style="display:none" onclick="startWrong()">🔁 Ôn câu sai</button>
+  </div>
+</div>
+
+<!-- NUMPAD -->
+<div class="numpad-wrap" id="numpad-wrap" style="display:none">
+  <div class="numpad-lbl">Điều hướng</div>
+  <div class="numpad" id="numpad"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen">
+  <div class="q-topbar">
+    <div class="q-title-area">
+      <div class="q-title" id="q-title"></div>
+      <div class="q-subtitle" id="q-sub"></div>
+    </div>
+    <div class="score-pills">
+      <span class="pill pill-g">✓ <span id="sc-g">0</span></span>
+      <span class="pill pill-r">✗ <span id="sc-r">0</span></span>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  </div>
+  <div class="q-card" id="q-card">
+    <div class="q-meta" id="q-meta"></div>
+    <p class="q-text" id="q-text"></p>
+    <div class="opts" id="opts"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+  <div class="nav-bar">
+    <div class="btn-row">
+      <button class="btn btn-sm" id="btn-prev" onclick="go(-1)">← Trước</button>
+      <button class="btn btn-sm btn-primary" id="btn-next" onclick="go(1)">Tiếp →</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-sm" onclick="showResult()">Kết quả</button>
+      <button class="btn btn-sm" onclick="backHome()">⌂ Trang chủ</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen">
+  <div class="res-hero">
+    <div class="res-pct" id="res-pct"></div>
+    <div class="res-grade" id="res-grade"></div>
+    <div class="res-sub" id="res-sub"></div>
+  </div>
+  <div class="res-grid">
+    <div class="rbox"><div class="rn" id="rs-done"></div><div class="rl">Đã làm</div></div>
+    <div class="rbox"><div class="rn" style="color:var(--green)" id="rs-ok"></div><div class="rl">Đúng</div></div>
+    <div class="rbox"><div class="rn" style="color:var(--red)" id="rs-bad"></div><div class="rl">Sai</div></div>
+    <div class="rbox"><div class="rn" style="color:var(--text3)" id="rs-skip"></div><div class="rl">Bỏ qua</div></div>
+  </div>
+  <div class="wrong-sec" id="wrong-sec" style="display:none">
+    <h3>Câu sai cần ôn lại</h3>
+    <div id="wrong-list"></div>
+  </div>
+  <div class="btn-row" style="justify-content:center;margin-top:16px">
+    <button class="btn btn-primary" onclick="backHome()">⌂ Về trang chủ</button>
+    <button class="btn" onclick="retryWrong()">Ôn lại câu sai</button>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════
+//  QUESTION BANK
+// ═══════════════════════════════════════
+const CHAPTERS = [
+// ── TOPIC 1: EXPLORING COLLEGE ──────────────────────────────────────
+{id:'T1',title:'Exploring College',sub:'Tiết 1–3',theme:'theme-a',qs:[
+  {q:"What is the purpose of the 'Five Whys' technique when applied to college enrollment?",opts:["To help students choose the right major","To help students uncover their deeper motivations and underlying purpose for attending college","To analyze the cost and ROI of a college degree","To identify the five most important study strategies"],ans:[1],tag:"Why College"},
+  {q:"Who created the 'Five Whys' questioning technique?",opts:["John Dewey","Benjamin Franklin","Sakichi Toyoda","Stanford University"],ans:[2],tag:"Why College"},
+  {q:"According to the chapter, which of the following is a financial benefit of a college degree?",opts:["Guaranteed employment in your field","Higher lifetime earnings and strong long-term return on investment","Free tuition at graduate school","No student loan debt"],ans:[1],tag:"Why College"},
+  {q:"Which of the following is NOT one of the six areas of adjustment described for the first year of college?",opts:["Academic Adjustment","Financial Adjustment","Social Adjustment","Technical Adjustment"],ans:[3],tag:"First Year"},
+  {q:"What does the 'hidden curriculum' in college refer to?",opts:["Secret courses available only to honor students","Unwritten or unspoken expectations — such as preparing before class and seeking help — that are not explicitly taught","The core curriculum required for graduation","Advanced topics not covered in the syllabus"],ans:[1],tag:"College Culture"},
+  {q:"How does college differ from high school in terms of learning responsibility?",opts:["College has more daily assignments and more chances to recover from low grades","College requires greater independent study and places much more responsibility on the student to monitor their own progress","College professors check homework more frequently than high school teachers","College has shorter exams that cover less material"],ans:[1],tag:"College Culture"},
+  {q:"What is one of the common challenges students face in the first year of college?",opts:["Having too many friends","Feeling like an imposter and worrying about making mistakes","Getting too much sleep","Having too much free time"],ans:[1],tag:"First Year"},
+  {q:"According to research on purpose and well-being, people with a strong sense of purpose experience:",opts:["More stress and higher academic pressure","Less stress, greater job satisfaction, and better long-term well-being","More social anxiety but better grades","No difference in outcomes compared to those without purpose"],ans:[1],tag:"Why College"},
+  {q:"What is the '1-Month Plan' in the First-Year Development Plan designed to achieve?",opts:["Complete a major research project","Adapt to university life and build basic habits — such as attending all classes and starting a daily study routine","Achieve intermediate level in a foreign language","Build a network of 10–15 contacts"],ans:[1],tag:"Action Plan"},
+  {q:"What is the '12-Month Plan' in the First-Year Development Plan designed to achieve?",opts:["Choose a study abroad destination","Transform into a confident, active, skilled student — with a complete portfolio, clear career direction, and a network of contacts","Complete all core required courses","Perfect exam scores in all subjects"],ans:[1],tag:"Action Plan"},
+]},
+// ── TOPIC 2: STUDYING, MEMORY & TEST TAKING ─────────────────────────
+{id:'T2',title:'Studying, Memory & Test Taking',sub:'Tiết 4–6',theme:'theme-b',qs:[
+  {q:"What are the three main processes of memory?",opts:["Input, Process, Output","Encoding, Storage, Retrieval","Short-term, Long-term, Working","Sensory, Motor, Cognitive"],ans:[1],tag:"Memory"},
+  {q:"How does 'working memory' function?",opts:["It permanently stores all information learned","It allows you to access stored information needed for the task you are doing right now","It is the same as long-term memory","It stores information for exactly 24 hours"],ans:[1],tag:"Memory"},
+  {q:"Typical short-term memory can recall approximately how many items at once?",opts:["1–3 items","5–9 items","10–15 items","20–25 items"],ans:[1],tag:"Memory"},
+  {q:"What are 'mnemonics'?",opts:["Types of memory disorders","Memory aids that help you recall information using simple reminders or patterns","A type of note-taking system","Flashcard study tools"],ans:[1],tag:"Study Strategies"},
+  {q:"What is 'concept association' as a study strategy?",opts:["Memorizing concepts in isolation","Connecting new information to previous experiences, knowledge, or memories to deepen understanding","Creating flashcards for every concept","Highlighting key terms in textbooks"],ans:[1],tag:"Study Strategies"},
+  {q:"What are 'idea clusters' (mind maps) used for in studying?",opts:["Organizing your class schedule","A visual method that links a main idea to related concepts to improve recall and comprehension","Taking linear notes during lectures","Creating study schedules"],ans:[1],tag:"Study Strategies"},
+  {q:"What is the 'Spacing' study strategy?",opts:["Studying one subject for long uninterrupted hours","Studying over several days rather than all at once — to improve long-term retention","Spacing your desk with organized materials","Keeping equal physical distance between study sessions"],ans:[1],tag:"Study Strategies"},
+  {q:"What is 'test anxiety' and how can it be managed?",opts:["Test anxiety is excitement before exams; it should be encouraged","Nervousness that can affect focus and performance; managed through thorough preparation, deep breathing, and positive visualization","A condition requiring medical treatment only","A mild feeling that improves test scores"],ans:[1],tag:"Test Taking"},
+  {q:"What is the recommended strategy for 'during the test' according to the chapter?",opts:["Start with the hardest questions to get them over with","Do the easiest questions first, read all questions fully, skip tough ones and return later","Answer questions in strict numerical order without skipping","Focus only on essay questions before multiple choice"],ans:[1],tag:"Test Taking"},
+  {q:"Which of the following is identified as a 'myth' about studying?",opts:["Spacing study sessions improves retention","Multitasking while studying is effective and efficient","Practice testing strengthens memory","Creating a dedicated study environment reduces distraction"],ans:[1],tag:"Study Myths"},
+]},
+// ── TOPIC 3: TIME MANAGEMENT ─────────────────────────────────────────
+{id:'T3',title:'Time Management Skills',sub:'Tiết 7–12',theme:'theme-c',qs:[
+  {q:"How does time management in college differ from high school?",opts:["College has fewer independent tasks and more teacher-managed time","In college, the student manages their own time with much greater independent study required — roughly 2 hours outside class for every 1 hour in class","High school requires more independent study than college","College and high school have identical time management demands"],ans:[1],tag:"College vs High School"},
+  {q:"What is 'procrastination' and why is it problematic in college?",opts:["A planning technique used to prioritize tasks","The act of delaying tasks, which leads to loss of time, goals, self-esteem, and increased stress — especially problematic because college work is too complex for last-minute completion","A motivational strategy to work under deadline pressure","An effective way to manage a heavy workload"],ans:[1],tag:"Procrastination"},
+  {q:"Which of the following is NOT listed as a reason behind procrastination?",opts:["Lack of energy or fatigue","Lack of focus or disorganization","Fear of failure","Having too many resources available"],ans:[3],tag:"Procrastination"},
+  {q:"What is 'prioritization' in the context of time management?",opts:["Doing the easiest tasks first to build momentum","Ordering tasks based on needs and value, allotting appropriate time for each, to maximize productivity and minimize stress","Creating a daily to-do list of all possible tasks","Delegating tasks to others"],ans:[1],tag:"Prioritization"},
+  {q:"When prioritizing tasks, what three factors should decisions be based on?",opts:["Cost, time, and difficulty","Importance, impact on other priorities, and urgency","Deadline, length, and subject","Instructor preference, personal interest, and difficulty"],ans:[1],tag:"Prioritization"},
+  {q:"What is the 'Daily Top Three' time management strategy?",opts:["Studying for exactly 3 hours per day","Identifying and completing the three most important tasks each day — yielding up to 18 completed tasks per week","Making a to-do list of all tasks and doing the top three first","Waking up 3 hours before class to prepare"],ans:[1],tag:"Enhanced Strategies"},
+  {q:"What is the 'Pomodoro Technique'?",opts:["A diet plan for productive students","A method using a 25-minute work timer followed by short breaks — then a longer break after 4 cycles — to maintain focus and reduce fatigue","A note-taking system using 25-word summaries","A method of studying 25 pages per session"],ans:[1],tag:"Enhanced Strategies"},
+  {q:"What does 'Eat the Frog' mean as a time management strategy?",opts:["Eat breakfast before studying for energy","Do the biggest or most unpleasant task first thing to reduce anxiety and build momentum for the rest of the day","Complete all easy tasks before starting a difficult one","Save the most important task for last"],ans:[1],tag:"Enhanced Strategies"},
+  {q:"According to the chapter on stress management, what percentage of college students reported experiencing overwhelming anxiety within a 12-month period (2018 ACHA report)?",opts:["32%","42%","52%","63%"],ans:[3],tag:"Stress Management"},
+  {q:"What is 'mindfulness' in the context of managing stress?",opts:["Memorizing mindfulness quotes","Being fully present with your thoughts, feelings, body, and surroundings without judgment — focusing on the present moment","Avoiding all stressful situations","A type of intense concentration exercise"],ans:[1],tag:"Stress Management"},
+  {q:"What is the '2-4-6-8' deep breathing technique used for?",opts:["Counting study sessions","A structured breathing pattern (exhale 2, inhale 4, hold 6, exhale 8) proven to lower stress and reduce anxiety","Timing Pomodoro work sessions","Organizing daily tasks"],ans:[1],tag:"Stress Management"},
+  {q:"What is 'chronic stress' and how does it differ from positive stress?",opts:["Chronic stress always improves performance; positive stress causes harm","Chronic stress is constant, reduces concentration, and can damage physical and mental health over time — unlike positive stress which can increase focus and motivation","They are the same thing","Positive stress is long-term; chronic stress is short-term"],ans:[1],tag:"Stress Management"},
+]},
+// ── TOPIC 4: COMMUNICATION SKILLS ───────────────────────────────────
+{id:'T4',title:'Communication Skills',sub:'Tiết 16–18',theme:'theme-d',qs:[
+  {q:"What are the four main modes of information transfer in communication?",opts:["Writing, Speaking, Listening, Reading","Vocal, Written, Visual, Nonverbal","Digital, Analog, Printed, Verbal","Formal, Informal, Direct, Indirect"],ans:[1],tag:"Communication Basics"},
+  {q:"What is 'Netiquette'?",opts:["A type of computer network protocol","Rules and etiquette for online communication — such as avoiding ALL CAPS (which feels like shouting) and maintaining a respectful tone","A social media platform for students","A type of digital file format"],ans:[1],tag:"Technology"},
+  {q:"Why is 'Emotional Intelligence (EQ)' important in communication?",opts:["It helps you memorize more vocabulary","It helps you choose the right method and timing, recognize emotional cues, adjust your reactions, and prevent miscommunication","It improves typing speed for digital communication","It is only useful in personal relationships, not academic settings"],ans:[1],tag:"Emotional Intelligence"},
+  {q:"What is the difference between 'listening' and 'hearing' in communication?",opts:["They are the same thing","Hearing is simply receiving sound, while listening involves actively understanding the meaning — optimal communication requires active listening from both parties","Listening is a passive activity; hearing requires effort","Hearing is more important for effective communication"],ans:[1],tag:"Listening"},
+  {q:"What are 'active listening strategies'?",opts:["Taking notes on everything said","Stopping talking, removing distractions, showing empathy, not jumping to solutions, and repeating back what you heard to confirm understanding","Only maintaining eye contact","Asking as many questions as possible"],ans:[1],tag:"Listening"},
+  {q:"What is 'context' in communication?",opts:["The length of a message","The setting, culture, timing, purpose, audience, and method — everyone must share an understanding of the situation for communication to be effective","The subject line of an email","The grammar and vocabulary used"],ans:[1],tag:"Context"},
+  {q:"How should you communicate with a professor about a late assignment?",opts:["Send a casual text message the day of the deadline","Visit during office hours or send a professional email — matching the formal context of the relationship","Wait to see if they notice","Post about it on social media"],ans:[1],tag:"Context"},
+  {q:"According to Howard Rheingold, what is 'mindful participation' in digital spaces?",opts:["Spending maximum time online to stay informed","Consciously choosing how to engage with technology to stay in control of your online actions and make online life more productive and less stressful","Avoiding all social media platforms","Only using approved educational technology"],ans:[1],tag:"Technology"},
+  {q:"What is a common 'language barrier' in communication?",opts:["Speaking too slowly","Use of jargon, technical terms, slang, or unfamiliar colloquialisms that the receiver does not understand","Using too many formal words","Communicating in a foreign language only"],ans:[1],tag:"Barriers"},
+  {q:"Why does technology reduce effective communication in some cases?",opts:["Technology always improves communication","Devices remove nonverbal cues like tone, gestures, and body language — making it easier to misinterpret emotions, especially in text-only communication","Technology only affects formal communication","People use too many words when communicating digitally"],ans:[1],tag:"Technology"},
+]},
+// ── TOPIC 5: LEARNING TO LEARN ONLINE + GROUP PROJECT ───────────────
+{id:'T5',title:'Online Learning & Group Project',sub:'Tiết 13–15, 19–20',theme:'theme-e',qs:[
+  {q:"What is the weight of the Academic Development Group Project in the course?",opts:["20%","30%","40%","50%"],ans:[3],tag:"Group Project"},
+  {q:"What are the three components of the Academic Development Group Project?",opts:["Quiz, Exam, and Final Paper","Proposal, Presentation, and Final Report","Lab Work, Written Report, and Peer Review","Draft, Revision, and Submission"],ans:[1],tag:"Group Project"},
+  {q:"How many students are required per group in the Academic Development Project?",opts:["1–2 students","3–5 students","6–8 students","10 or more students"],ans:[1],tag:"Group Project"},
+  {q:"What is the final report length requirement for the Academic Development Group Project?",opts:["500–800 words","1,000–1,500 words","2,200–3,000 words","5,000–6,000 words"],ans:[2],tag:"Group Project"},
+  {q:"What citation style is required for the Academic Development Group Project final report?",opts:["MLA 8th edition","Chicago Style","APA 7th edition","Harvard Style"],ans:[2],tag:"Group Project"},
+  {q:"In the brainstorming process for project ideas, what is the correct order of steps?",opts:["Select best idea → Define goal → Share freely → Group ideas → Build on ideas","Define goal → Share freely → Build on each other's ideas → Group & organize → Select best idea","Group ideas → Share freely → Define goal → Build on ideas → Select","Share freely → Build → Define goal → Group → Select"],ans:[1],tag:"Group Project"},
+  {q:"What is the key principle of the 'Share freely' brainstorming step?",opts:["Only share ideas that are already fully developed","Encourage everyone to contribute openly with no judging or filtering — quantity matters more than quality at first","Write down only the most realistic ideas","Let the team leader decide which ideas to share"],ans:[1],tag:"Group Project"},
+  {q:"What does 'Learning to Learn Online' help students develop?",opts:["Only technical coding skills","Self-directed learning skills, effective time management for online courses, professional communication, and reading strategies for digital content","Advanced research techniques only","Social media management skills"],ans:[1],tag:"Online Learning"},
+  {q:"What is a 'self-directed learner' in the context of online learning?",opts:["A student who learns without any instructor guidance","A student who understands themselves as a learner and takes ownership of their learning — managing time, information, and communication effectively","A student who only uses self-paced courses","A student who avoids group work"],ans:[1],tag:"Online Learning"},
+  {q:"What does the 'Plan-Monitor-Evaluate' model help online learners do?",opts:["Plan their social schedule around study time","Assess and manage their own learning progress by planning what to learn, monitoring understanding, and evaluating effectiveness","Create weekly shopping and meal plans","Track their internet usage"],ans:[1],tag:"Online Learning"},
+]},
+];
+
+// ── STATE ──────────────────────────────
+let pool=[],idx=0,answered={},score=0,wrongCount=0;
+let wrongQs=new Set(),multiSel=[],curChapter=null;
+const chProgress={};
+
+// ── INIT ───────────────────────────────
+function init(){
+  const grid=document.getElementById('ch-grid');
+  CHAPTERS.forEach((ch,ci)=>{
+    chProgress[ch.id]={};
+    const el=document.createElement('div');
+    el.className=`ch-card ${ch.theme}`;
+    el.id='chcard-'+ch.id;
+    el.innerHTML=`<div class="ch-num">${ch.id.replace('T','TOPIC ')}</div>
+      <div class="ch-title">${ch.title}</div>
+      <div class="ch-sub">${ch.sub}</div>
+      <div class="ch-score" id="chscore-${ch.id}">${ch.qs.length} câu hỏi</div>
+      <div class="ch-tick">✓</div>`;
+    el.onclick=()=>startChapter(ci);
+    grid.appendChild(el);
+  });
+}
+
+function startChapter(ci){
+  curChapter=ci; pool=[...CHAPTERS[ci].qs];
+  beginQuiz(`${CHAPTERS[ci].title}`);
+}
+function startAll(){
+  curChapter=null;
+  pool=CHAPTERS.flatMap(ch=>ch.qs.map(q=>({...q,_ch:ch.id,_title:ch.title})));
+  beginQuiz('Tất cả chủ đề');
+}
+function startRandom(){
+  curChapter=null;
+  pool=CHAPTERS.flatMap(ch=>ch.qs.map(q=>({...q,_ch:ch.id,_title:ch.title}))).sort(()=>Math.random()-0.5);
+  beginQuiz('Ngẫu nhiên');
+}
+function startWrong(){
+  if(!wrongQs.size){alert('Chưa có câu sai!');return;}
+  pool=[];
+  CHAPTERS.forEach(ch=>ch.qs.forEach((q,qi)=>{
+    if(wrongQs.has(ch.id+':'+qi)) pool.push({...q,_ch:ch.id,_qi:qi});
+  }));
+  if(!pool.length){alert('Không tìm thấy!');return;}
+  beginQuiz('Ôn lại câu sai');
+}
+function retryWrong(){startWrong();}
+
+function beginQuiz(title){
+  idx=0; answered={}; score=0; wrongCount=0; multiSel=[];
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  document.getElementById('numpad-wrap').style.display='block';
+  document.getElementById('q-title').textContent=title;
+  buildNumpad(); renderQ();
+}
+
+// ── RENDER ─────────────────────────────
+function renderQ(){
+  const q=pool[idx], total=pool.length;
+  document.getElementById('prog').style.width=((idx/total)*100).toFixed(1)+'%';
+  document.getElementById('q-sub').textContent=`Câu ${idx+1} / ${total}`;
+  document.getElementById('sc-g').textContent=score;
+  document.getElementById('sc-r').textContent=wrongCount;
+  const isMulti=q.ans.length>1;
+  document.getElementById('q-meta').innerHTML=
+    `<span class="q-badge q-n-badge">Q${idx+1}</span>
+     <span class="q-badge q-tag-badge">${q.tag||''}</span>
+     ${q._ch?`<span class="q-badge q-ch-badge">${q._ch}</span>`:''}
+     ${isMulti?`<span class="q-badge q-multi-badge">Chọn nhiều</span>`:''}`;
+  document.getElementById('q-text').textContent=q.q;
+  const opts=document.getElementById('opts'); opts.innerHTML='';
+  const state=answered[idx]; multiSel=state?[...state.chosen]:[];
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML=`<span class="opt-key">${String.fromCharCode(65+i)}</span><span>${o}</span>`;
+    if(state){
+      b.disabled=true;
+      if(q.ans.includes(i)) b.classList.add(state.chosen.includes(i)?'correct':'reveal');
+      else if(state.chosen.includes(i)) b.classList.add('wrong');
+    } else {
+      if(!isMulti) b.onclick=()=>answerSingle(i);
+      else { if(multiSel.includes(i)) b.classList.add('sel'); b.onclick=()=>toggleMulti(i,b); }
+    }
+    opts.appendChild(b);
+  });
+  if(isMulti&&!state){
+    const cb=document.createElement('button');
+    cb.className='btn btn-primary btn-sm'; cb.style.marginTop='12px';
+    cb.textContent='Xác nhận'; cb.onclick=confirmMulti;
+    opts.appendChild(cb);
+  }
+  const fb=document.getElementById('feedback');
+  if(state){
+    fb.style.display='block';
+    fb.className='feedback '+(state.ok?'ok':'no');
+    fb.textContent=state.ok?'✓ Chính xác!':'✗ Đáp án đúng: '+q.ans.map(a=>String.fromCharCode(65+a)+'. '+q.opts[a]).join(' | ');
+  } else fb.style.display='none';
+  document.getElementById('btn-next').textContent=idx===pool.length-1?'Xem kết quả →':'Tiếp →';
+  document.getElementById('btn-prev').style.opacity=idx===0?'0.35':'1';
+  updateNumpad();
+  document.getElementById('q-card').style.animation='none';
+  requestAnimationFrame(()=>document.getElementById('q-card').style.animation='');
+}
+
+function answerSingle(i){
+  const q=pool[idx], ok=q.ans.includes(i);
+  answered[idx]={chosen:[i],ok};
+  if(ok) score++; else {wrongCount++;markWrong(q,idx);}
+  renderQ();
+}
+function toggleMulti(i,btn){
+  const pos=multiSel.indexOf(i);
+  if(pos===-1) multiSel.push(i); else multiSel.splice(pos,1);
+  document.querySelectorAll('.opt').forEach((b,bi)=>{
+    if(bi<pool[idx].opts.length) b.classList.toggle('sel',multiSel.includes(bi));
+  });
+}
+function confirmMulti(){
+  if(!multiSel.length){alert('Hãy chọn ít nhất một đáp án!');return;}
+  const q=pool[idx];
+  const ok=q.ans.length===multiSel.length&&q.ans.every(a=>multiSel.includes(a));
+  answered[idx]={chosen:[...multiSel],ok};
+  if(ok) score++; else {wrongCount++;markWrong(q,idx);}
+  renderQ();
+}
+function markWrong(q,pi){
+  const chId=q._ch||(curChapter!=null?CHAPTERS[curChapter].id:'');
+  const qi=q._qi!=null?q._qi:CHAPTERS.find(c=>c.id===chId)?.qs.indexOf(q);
+  if(chId&&qi!=null) wrongQs.add(chId+':'+qi);
+}
+
+function go(dir){
+  const n=idx+dir;
+  if(n<0) return;
+  if(n>=pool.length){showResult();return;}
+  idx=n; multiSel=[]; renderQ();
+}
+
+// ── NUMPAD ─────────────────────────────
+function buildNumpad(){
+  const np=document.getElementById('numpad'); np.innerHTML='';
+  pool.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='np'; b.textContent=i+1; b.id='np-'+i;
+    b.onclick=()=>{idx=i;multiSel=[];renderQ();};
+    np.appendChild(b);
+  });
+}
+function updateNumpad(){
+  pool.forEach((_,i)=>{
+    const b=document.getElementById('np-'+i); if(!b) return;
+    b.className='np';
+    if(i===idx) b.classList.add('cur');
+    else if(answered[i]) b.classList.add(answered[i].ok?'ok':'bad');
+  });
+}
+
+// ── RESULT ─────────────────────────────
+function showResult(){
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('numpad-wrap').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  const total=pool.length, done=Object.keys(answered).length;
+  const skip=total-done;
+  const pct=done>0?Math.round(score/done*100):0;
+  let grade,color;
+  if(pct>=90){grade='🏆 Xuất sắc!';color='#27ae60';}
+  else if(pct>=80){grade='✓ Giỏi';color='#2ecc71';}
+  else if(pct>=65){grade='~ Khá';color:'#f39c12';}
+  else if(pct>=50){grade='~ Trung bình';color='#e07b3a';}
+  else{grade='✗ Cần ôn thêm';color='#e74c3c';}
+  document.getElementById('res-pct').textContent=pct+'%';
+  document.getElementById('res-pct').style.color=color;
+  document.getElementById('res-grade').textContent=grade;
+  document.getElementById('res-grade').style.color=color;
+  document.getElementById('res-sub').textContent=`${score} / ${done} câu đúng · ${total} câu tổng`;
+  document.getElementById('rs-done').textContent=done;
+  document.getElementById('rs-ok').textContent=score;
+  document.getElementById('rs-bad').textContent=wrongCount;
+  document.getElementById('rs-skip').textContent=skip;
+  const wrongs=pool.map((q,i)=>({q,i,s:answered[i]})).filter(x=>x.s&&!x.s.ok);
+  const ws=document.getElementById('wrong-sec'), wl=document.getElementById('wrong-list');
+  if(wrongs.length){
+    ws.style.display='block';
+    wl.innerHTML=wrongs.map(({q,s})=>`<div class="wi">
+      <div class="wi-q">${q.q}</div>
+      <div class="wi-row">
+        <span class="wi-your">Bạn: ${s.chosen.map(a=>q.opts[a]).join(' / ')}</span>
+        <span class="wi-ans">Đúng: ${q.ans.map(a=>q.opts[a]).join(' / ')}</span>
+      </div></div>`).join('');
+  } else ws.style.display='none';
+  if(wrongQs.size>0) document.getElementById('btn-retry-wrong').style.display='inline-flex';
+  // update chapter card
+  if(curChapter!=null){
+    const ch=CHAPTERS[curChapter];
+    const sc=document.getElementById('chscore-'+ch.id);
+    if(sc) sc.textContent=`${score}/${Object.keys(answered).length} đúng · ${pct}%`;
+    const card=document.getElementById('chcard-'+ch.id);
+    if(card&&pct>=70) card.classList.add('completed');
+  }
+}
+
+function backHome(){
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('numpad-wrap').style.display='none';
+  document.getElementById('home-screen').style.display='block';
+  if(wrongQs.size>0) document.getElementById('btn-retry-wrong').style.display='inline-flex';
+}
+
+init();
+</script>
+</body>
+</html>
